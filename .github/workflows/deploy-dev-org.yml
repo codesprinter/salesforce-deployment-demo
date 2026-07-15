@@ -1,0 +1,67 @@
+name: Deploy to Salesforce Developer Org
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # Install Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Install Salesforce CLI
+      - name: Install Salesforce CLI
+        run: |
+          npm install --global @salesforce/cli
+          sf version
+
+      # Authenticate to Developer Org
+      - name: Authenticate to Salesforce
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: |
+          echo "$SFDX_AUTH_URL" > sfdx_auth_url.txt
+
+          sf org login sfdx-url \
+            --sfdx-url-file sfdx_auth_url.txt \
+            --alias DevOrg \
+            --set-default
+
+      # Display authenticated org
+      - name: Verify Authentication
+        run: |
+          sf org display --target-org DevOrg
+
+      # Deploy metadata
+      - name: Deploy Source
+        run: |
+          sf project deploy start \
+            --source-dir force-app \
+            --target-org DevOrg \
+            --ignore-conflicts \
+            --wait 60
+
+      # Run Apex Tests (optional)
+      - name: Run Apex Tests
+        run: |
+          sf apex run test \
+            --target-org DevOrg \
+            --test-level RunLocalTests \
+            --wait 60
+
+      # Show deployment status
+      - name: Deployment Complete
+        run: echo "Deployment completed successfully."
