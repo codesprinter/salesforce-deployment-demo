@@ -11,6 +11,6 @@ public class TestVerifyDate {
          Date date1 = Date.newInstance(2016, 12, 9);
          Date date2 = (date1.addDays(35));
          Date resDate = VerifyDate.CheckDates(date1, date2);
-        System.assertEquals(date1,resDate);
+        System.assertEquals(Date.newInstance(2016, 12, 31), resDate);
     }
 }

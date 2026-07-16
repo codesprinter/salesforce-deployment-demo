@@ -1,24 +1,22 @@
 @isTest()
 public class AccountProcessorTest {
-    /*private class HttpMock implements HttpCalloutMock {
-
+    private class HttpMock implements HttpCalloutMock {
         public HTTPResponse respond(HTTPRequest req) {
-            String fullJson = 'your Json Response';
-
             HTTPResponse res = new HTTPResponse();
-            res.setHeader('Content-Type', 'text/json');
-            res.setBody(fullJson);
+            res.setHeader('Content-Type', 'application/json');
+            res.setBody('{"accepted":true,"correlationId":"test-123","error":null}');
             res.setStatusCode(200);
             return res;
         }
-    }*/
+    }
+
     public AccountProcessorTest() {
 
     }
 
     @IsTest
     private static void testContactCount() {
-        //Test.setMock(HttpCalloutMock.class, new HttpMock());
+        Test.setMock(HttpCalloutMock.class, new HttpMock());
         List<Account> accounts = new List<Account>();
         Account acc = new Account(Name='Syedur');
         accounts.add(acc);
@@ -31,8 +29,6 @@ public class AccountProcessorTest {
         Test.startTest();
         AccountProcessor.countContacts(accountIds);
         Test.stopTest();
-        // runs callout and check results
-        //System.assertEquals(1, logs.size());
         System.assertEquals(true, accounts.size() > 0);
     }
 }

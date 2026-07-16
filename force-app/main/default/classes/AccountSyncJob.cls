@@ -1,14 +1,14 @@
 public with sharing class AccountSyncJob implements Queueable, Database.AllowsCallouts {
-  private final Id accountId;
+  private final Set<Id> accountIds;
 
-  public AccountSyncJob(Id accountId) {
-    this.accountId = accountId;
+  public AccountSyncJob(Set<Id> accountIds) {
+    this.accountIds = accountIds;
   }
 
   public void execute(QueueableContext context) {
-    System.debug(LoggingLevel.INFO, 'AccountSyncJob.execute >> accountId=' + accountId);
+    System.debug(LoggingLevel.INFO, 'AccountSyncJob.execute >> accountIds=' + accountIds);
 
-    Account accountRecord = [
+    List<Account> accountRecords = [
       SELECT
         Id,
         External_Key__c,
@@ -21,31 +21,32 @@ public with sharing class AccountSyncJob implements Queueable, Database.AllowsCa
         CreatedDate,
         LastModifiedDate
       FROM Account
-      WHERE Id = :accountId
-      LIMIT 1
+      WHERE Id IN :accountIds
     ];
 
-    System.debug(LoggingLevel.FINE, 'AccountSyncJob.execute >> name=' + accountRecord.Name + ' email=' + accountRecord.Email__c);
+    for (Account accountRecord : accountRecords) {
+      System.debug(LoggingLevel.FINE, 'AccountSyncJob.execute >> name=' + accountRecord.Name + ' email=' + accountRecord.Email__c);
 
-    Map<String, Object> payload = new Map<String, Object>{
-      'salesforceId'    => accountRecord.Id,
-      'externalKey'     => accountRecord.External_Key__c,
-      'name'            => accountRecord.Name,
-      'phone'           => accountRecord.Phone,
-      'email'           => accountRecord.Email__c,
-      'billingAddress'  => accountRecord.BillingStreet,
-      'billingCity'     => accountRecord.BillingCity,
-      'billingCountry'  => accountRecord.BillingCountry,
-      'createdDate'     => accountRecord.CreatedDate,
-      'lastModifiedDate' => accountRecord.LastModifiedDate
-    };
+      Map<String, Object> payload = new Map<String, Object>{
+        'salesforceId'    => accountRecord.Id,
+        'externalKey'     => accountRecord.External_Key__c,
+        'name'            => accountRecord.Name,
+        'phone'           => accountRecord.Phone,
+        'email'           => accountRecord.Email__c,
+        'billingAddress'  => accountRecord.BillingStreet,
+        'billingCity'     => accountRecord.BillingCity,
+        'billingCountry'  => accountRecord.BillingCountry,
+        'createdDate'     => accountRecord.CreatedDate,
+        'lastModifiedDate' => accountRecord.LastModifiedDate
+      };
 
-    AccountSyncClient.SyncResponse result = AccountSyncClient.sendAccount(String.valueOf(accountRecord.Id), payload);
+      AccountSyncClient.SyncResponse result = AccountSyncClient.sendAccount(String.valueOf(accountRecord.Id), payload);
 
-    if (result.error != null) {
-      System.debug(LoggingLevel.ERROR, 'AccountSyncJob.execute << sync failed. correlationId=' + result.correlationId + ' error=' + result.error);
-    } else {
-      System.debug(LoggingLevel.INFO, 'AccountSyncJob.execute << sync accepted. correlationId=' + result.correlationId);
+      if (result.error != null) {
+        System.debug(LoggingLevel.ERROR, 'AccountSyncJob.execute << sync failed. correlationId=' + result.correlationId + ' error=' + result.error);
+      } else {
+        System.debug(LoggingLevel.INFO, 'AccountSyncJob.execute << sync accepted. correlationId=' + result.correlationId);
+      }
     }
   }
 }
