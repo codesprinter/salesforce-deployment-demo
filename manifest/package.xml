@@ -18,6 +18,8 @@
         <members>AnimalLocatorMock</members>
         <members>AnimalLocatorTest</members>
         <members>AnimalsCallouts</members>
+        <members>ContactsTodayController</members>
+        <members>ContactsTodayControllerTest</members>
         <members>AnimalsCalloutsTest</members>
         <members>AnimalsHttpCalloutMock</members>
         <members>CalloutClass</members>
