@@ -77,7 +77,6 @@
         <name>CustomField</name>
     </types>
     <types>
-        <members>Account</members>
         <members>Battle_Station__c</members>
         <members>Candidate__c</members>
         <members>Interviewer__c</members>

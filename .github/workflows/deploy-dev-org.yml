@@ -49,7 +49,7 @@ jobs:
       - name: Deploy Source
         run: |
           sf project deploy start \
-            --source-dir force-app \
+            --manifest manifest/package.xml \
             --target-org DevOrg \
             --ignore-conflicts \
             --wait 60
