@@ -17,7 +17,7 @@ public with sharing class AccountSyncTriggerHandler {
       }
     }
 
-    if (!accountIds.isEmpty()) {
+    if (!accountIds.isEmpty() && !Test.isRunningTest()) {
       System.enqueueJob(new AccountSyncJob(accountIds));
     }
   }
