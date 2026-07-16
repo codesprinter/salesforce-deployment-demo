@@ -17,18 +17,14 @@ public class AccountProcessorTest {
     @IsTest
     private static void testContactCount() {
         Test.setMock(HttpCalloutMock.class, new HttpMock());
-        List<Account> accounts = new List<Account>();
         Account acc = new Account(Name='Syedur');
-        accounts.add(acc);
-        insert acc;
-        List<Id> accountIds = new list<Id>();
 
-		for(Account obj:accounts){
-    		accountIds.add(obj.Id);
-		}
         Test.startTest();
-        AccountProcessor.countContacts(accountIds);
+        insert acc;
+        AccountProcessor.countContacts(new List<Id>{ acc.Id });
         Test.stopTest();
-        System.assertEquals(true, accounts.size() > 0);
+
+        List<Account> result = [SELECT Id FROM Account];
+        System.assertEquals(true, result.size() > 0);
     }
 }
