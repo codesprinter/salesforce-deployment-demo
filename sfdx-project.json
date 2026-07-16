@@ -8,5 +8,5 @@
   "name": "salesforce-deployment-demo",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "53.0"
+  "sourceApiVersion": "67.0"
 }
